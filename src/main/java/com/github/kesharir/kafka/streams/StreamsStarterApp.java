@@ -39,5 +39,9 @@ public class StreamsStarterApp {
         streams.start();
         // printed the topology:
         System.out.println(streams.toString());
+        // Add shutdown hook to stop the Kafka Streams threads.
+        // You can optionally provide a timeout to `close`
+        Runtime.getRuntime().addShutdownHook(new Thread(streams::close));
+
     }
 }

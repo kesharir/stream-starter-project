@@ -16,14 +16,14 @@ public class StreamsStarterApp {
     public static void main(String[] args) {
         Properties config = new Properties();
         config.put(StreamsConfig.APPLICATION_ID_CONFIG, "streams-starter-app");
-        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
         StreamsBuilder builder = new StreamsBuilder();
         // 1 - stream from Kafka
-        KStream<String, String> wordCountInput = builder.stream("word-count-input");
+        KStream<String, String> wordCountInput = builder.stream("wordcount-input");
         // 2 - map values to lowercase
         KTable<String, Long> wordCounts = wordCountInput.mapValues(value -> value.toLowerCase())
         // 3 - flatmap values split by space
@@ -33,8 +33,8 @@ public class StreamsStarterApp {
         // 5 - group by key before aggregation
                 .groupByKey()
         // 6 - count occurences
-                .count(Named.as("Counts"));
-        wordCounts.toStream().to("word_count-output");
+                .count();
+        wordCounts.toStream().to("word-count-output");
         KafkaStreams streams = new KafkaStreams(builder.build(), config);
         streams.start();
         // printed the topology:
